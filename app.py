@@ -521,7 +521,7 @@ else:
         dup_counts = df.groupby("doc_id").cumcount()
         df.loc[dup_counts > 0, "doc_id"] = df.loc[dup_counts > 0, "doc_id"] + "_dup" + dup_counts[dup_counts > 0].astype(str)
 
-candidate_text_cols = [c for c in df.columns if df[c].dtype == object and c != "doc_id"]
+candidate_text_cols = [c for c in df.columns if (df[c].dtype == object or pd.api.types.is_string_dtype(df[c])) and c != "doc_id"]
 if not candidate_text_cols:
     st.error("No text column found. Please upload a CSV with at least one text column.")
     st.stop()
