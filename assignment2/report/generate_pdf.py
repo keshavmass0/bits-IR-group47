@@ -1,4 +1,4 @@
-"""Regenerates REPORT.pdf from REPORT.md.
+"""Regenerates SmartIR-2_Report_Team47.pdf from REPORT.md.
 
 Run after editing REPORT.md so the PDF submission artifact stays in sync:
 
@@ -35,7 +35,7 @@ CHROME_BINARY = os.environ.get(
 REPORT_DIR = Path(__file__).resolve().parent
 MD_PATH = REPORT_DIR / "REPORT.md"
 HTML_PATH = REPORT_DIR / "_REPORT_render.html"
-PDF_PATH = REPORT_DIR / "REPORT.pdf"
+PDF_PATH = REPORT_DIR / "SmartIR-2_Report_Team47.pdf"
 
 FIGURE_COUNTER = [0]
 

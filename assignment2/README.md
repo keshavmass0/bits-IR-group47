@@ -41,7 +41,9 @@ assignment2/
 │   ├── ir_store.db              # Generated at runtime: SQLite metadata + content tables
 │   └── synthetic_ratings.csv    # Generated at runtime: synthetic user-item ratings for CF
 ├── report/
-│   └── REPORT.md                # Full assignment report (see submission checklist below)
+│   ├── REPORT.md                       # Full assignment report source (see submission checklist below)
+│   ├── SmartIR-2_Report_Team47.pdf     # Submission-ready PDF rendering of the above
+│   └── generate_pdf.py                 # Regenerates the PDF after editing REPORT.md
 └── screenshots/                 # Put your Virtual Lab screenshots here before zipping up
 ```
 
