@@ -14,12 +14,13 @@ scripts or notebooks required for grading.
 > `assignment2/` folder on Streamlit Community Cloud (main file path `assignment2/app.py`),
 > so it always reflects the exact code submitted here.
 
-> **Before submitting:** every numeric result in this report was produced by actually
-> running the pipeline in `app.py` (see `modules/*.py`), on the shipped
-> `data/news_corpus.csv` corpus. The only things left as placeholders are the
-> **screenshots**, which must be captured from your own session running the app inside the
-> BITS Virtual Lab (see the `[SCREENSHOT: ...]` markers below) — that step cannot be done
-> on your behalf.
+> **Before submitting:** every numeric result and screenshot in this report was produced
+> by actually running the pipeline in `app.py` (see `modules/*.py`) end-to-end, driven
+> headlessly through a real browser session against the local app — not fabricated or
+> hand-typed. Screenshots reflect one specific run (crawl seed/depth are configurable, so
+> exact figures shift slightly run-to-run — the qualitative patterns discussed do not).
+> The one screenshot that genuinely cannot be produced this way is the **BITS Virtual Lab
+> session** itself (§9) — that still needs to be captured from your own run inside the lab.
 
 ---
 
@@ -60,6 +61,8 @@ The app (`app.py`) is organized into 9 tabs, each backed by a dedicated module u
 
 The complete workflow — crawl, mine, index, search, recommend, evaluate — is triggered
 entirely from these tabs. No step requires running a separate script or notebook.
+
+![Dashboard tab — system overview](../screenshots/01_dashboard.png)
 
 ### 2.2 Heterogeneous sources (Section B)
 
@@ -106,18 +109,20 @@ The crawler flags two kinds of duplication while it crawls:
 parent_url, content_hash, is_exact_duplicate, is_near_duplicate, duplicate_of,
 word_count`; content carries only `raw_text`/`clean_text`).
 
-**Observed on a representative crawl** (seed = home page, depth 3, max 400 pages):
+**Observed on a representative crawl** (seed = `local-news://business/hub`, depth 2, max
+350 pages — a single-category hub is used here specifically so the crawl's page budget
+reaches that category's injected mirror/near-duplicate pages, giving the duplicate
+inspector real rows to show):
 
 | Metric | Value |
 |---|---|
-| Pages fetched | 400 |
-| Skipped — URL duplicate | 0 |
+| Pages fetched | 292 |
+| Skipped — URL duplicate | 798 (articles cross-link to 2–3 "related stories" each, so BFS re-discovers already-visited pages constantly — this is expected and is exactly what URL dedup is for) |
 | Skipped — content duplicate (exact) | 11 |
 | Near-duplicates flagged | 14 |
-| Max depth reached | 2 |
-| Link-graph edges discovered | 2,311 |
+| Max depth reached | 1 |
 
-`[SCREENSHOT: Crawling tab after running a crawl — stats row + duplicate inspector table]`
+![Crawling tab — stats, crawl history, and duplicate inspector](../screenshots/02_crawling_results.png)
 
 ---
 
@@ -148,60 +153,75 @@ unmodified without internet access. `modules/text_mining.py` builds on it for:
 | entertainment | 153 |
 | **Total** | **1,110** |
 
-`[SCREENSHOT: Text Mining tab — category distribution & document-length distribution charts]`
+![Text Mining tab — category and document-length distributions](../screenshots/03_text_mining_charts.png)
 
 ### 3.2 Keyword extraction example (document `D001`)
 
 | Method | Top terms |
 |---|---|
-| TF-IDF | important, risks, higher, companies, rates |
-| RAKE (phrases) | "stock market reported strong economic growth"; "technology companies announced higher profits"; "interest rates remain important risks" |
+| TF-IDF | important, higher, risks, companies, rates, stock |
+| RAKE (phrases) | "stock market reported strong economic growth" (36); "technology companies announced higher profits" (25); "interest rates remain important risks" (25) |
 
 RAKE surfaces multi-word phrases while TF-IDF surfaces single discriminative terms —
-they are complementary, and both are shown side-by-side in the Document Profiling panel.
+they are complementary, and both are shown side-by-side in the Document Profiling panel,
+alongside word count (26), lexical diversity (0.962) and Flesch readability (17.9) for
+the same document.
 
-`[SCREENSHOT: Text Mining tab — keyword extraction & document profile for a chosen document]`
+![Text Mining tab — keyword extraction and document profile](../screenshots/04_text_mining_keywords.png)
 
-### 3.3 Classification results (full corpus, TF-IDF + Naive Bayes)
+### 3.3 Classification results (working corpus after a crawl, TF-IDF + Naive Bayes)
 
 | Metric | Value |
 |---|---|
-| Accuracy | 0.9964 |
-| F1 (macro) | 0.9957 |
-| Train / test split | 832 / 278 |
+| Accuracy | 0.9971 |
+| F1 (macro) | 0.9976 |
+| Test set size | 348 |
 
 Confusion matrix (rows = true, columns = predicted):
 
 | | business | entertainment | politics | sport | tech |
 |---|---|---|---|---|---|
-| **business** | 67 | 0 | 0 | 0 | 0 |
+| **business** | 136 | 0 | 0 | 0 | 1 |
 | **entertainment** | 0 | 38 | 0 | 0 | 0 |
 | **politics** | 0 | 0 | 50 | 0 | 0 |
 | **sport** | 0 | 0 | 0 | 64 | 0 |
-| **tech** | 0 | 1 | 0 | 0 | 58 |
+| **tech** | 0 | 0 | 0 | 0 | 59 |
 
-`[SCREENSHOT: Text Mining tab — "Train classifier" results]`
+![Text Mining tab — Train classifier results](../screenshots/05_text_mining_classifier.png)
+
+**Note on robustness (found via this exact run):** the working corpus can pick up a
+crawler navigational page (the "home" page) as a singleton pseudo-category once a crawl
+seeded from it has run. The first version of `classify_documents` passed every label
+straight into a stratified `train_test_split`, which **crashes outright** the moment any
+class has fewer than 2 members ("The least populated class... too few"). Fixed by
+excluding classes below a minimum size before splitting (`modules/text_mining.py`,
+`min_class_size` parameter) and surfacing which classes were dropped in the UI, rather
+than letting the whole app error out. This was only caught by driving the real app
+end-to-end (crawl → then classify) — it did **not** show up in isolated unit-style runs
+of `classify_documents` on the clean base dataset alone.
 
 ### 3.4 Comparative analysis: preprocessing × feature-extraction strategy
 
 | Normalization | Feature type | Accuracy | F1 (macro) |
 |---|---|---|---|
-| none | BoW | 0.9928 | 0.9914 |
-| none | TF-IDF | 0.9964 | 0.9957 |
-| stem | BoW | 0.9964 | 0.9957 |
-| stem | TF-IDF | 0.9964 | 0.9957 |
-| lemma | BoW | 0.9964 | 0.9957 |
-| lemma | TF-IDF | 0.9964 | 0.9957 |
+| none | BoW | 1.0000 | 1.0000 |
+| none | TF-IDF | 0.9971 | 0.9976 |
+| stem | BoW | 0.9971 | 0.9976 |
+| stem | TF-IDF | 0.9971 | 0.9976 |
+| lemma | BoW | 0.9971 | 0.9976 |
+| lemma | TF-IDF | 0.9971 | 0.9976 |
 
-`[SCREENSHOT: Text Mining tab — "Run comparative analysis" table + bar chart]`
+![Text Mining tab — comparative analysis table and chart](../screenshots/06_text_mining_comparative.png)
 
-**Inference:** on this corpus, TF-IDF consistently matches-or-beats raw BoW, and
-stemming/lemmatization closes the small remaining gap for BoW to match TF-IDF —
-consistent with TF-IDF's down-weighting of ubiquitous terms mattering more than
-morphological normalization once features are already fairly clean. Classification
-accuracy is very high overall (>99%) because the underlying synthetic news corpus uses
-fairly formulaic, topic-distinct phrasing per category (see §7 for a broader discussion
-of this as a corpus characteristic).
+**Inference:** on this corpus, every strategy clears 99.7% accuracy — raw BoW even
+reaches a perfect 1.0 in this run, because after a crawl the working corpus contains
+near-duplicate business articles (see §2.3) that are easy to classify correctly by raw
+word overlap alone. This is itself a useful, concrete illustration of §7 Q2's point that
+duplicate content can make evaluation numbers look better than genuine generalization
+would justify — accuracy this high is a signal to check for duplication, not solely a
+sign of a great classifier. On the deduplicated base dataset alone (no crawl), the same
+comparison shows TF-IDF modestly ahead of raw BoW, closing once stemming/lemmatization is
+applied (see the git history of this report for that baseline run's exact figures).
 
 ---
 
@@ -227,31 +247,36 @@ relevance score: `final = α·relevance + (1−α)·link_importance` (both min-m
 
 **Example — query `"technology company investment"`, α = 0.7 (TF-IDF + PageRank):**
 
-| doc_id | relevance | link score | blended | old rank | new rank | Δrank |
-|---|---|---|---|---|---|---|
-| D001 | 0.2848 | 0.00268 | 1.0000 | 1 | 1 | 0 |
-| D015 | 0.2161 | 0.00206 | 0.5871 | 2 | 2 | 0 |
-| **D1082** | 0.1563 | 0.00237 | 0.3349 | **8** | **3** | **+5** |
-| D025 | 0.1636 | 0.00206 | 0.3313 | 3 | 4 | −1 |
-| D1060 | 0.1611 | 0.00206 | 0.3191 | 4 | 5 | −1 |
-| **D0295** | 0.1436 | 0.00237 | 0.2730 | **15** | **8** | **+7** |
+| doc_id | title | relevance | link score | blended | old rank | new rank | Δrank |
+|---|---|---|---|---|---|---|---|
+| D001 | Market growth | 0.2848 | 0.0027 | 1.0000 | 1 | 1 | 0 |
+| D015 | Company investment | 0.2161 | 0.0021 | 0.4041 | 2 | 2 | 0 |
+| **D1082** | Trade and consumer confidence | 0.1563 | 0.0024 | 0.2965 | **8** | **3** | **+5** |
+| **D0295** | Interest rate decisions concerns | 0.1436 | 0.0024 | 0.2418 | **16** | **4** | **+12** |
+| **D0104** | Quarterly results | 0.1398 | 0.0024 | 0.2254 | **21** | **5** | **+16** |
+| D025 | Employment growth | 0.1636 | 0.0021 | 0.1779 | 3 | 6 | −3 |
 
-`[SCREENSHOT: Search & Ranking tab — the three ranking tabs (baseline / PageRank / HITS) for this query]`
+Baseline (TF-IDF only), PageRank-boosted, and HITS authority-boosted views of the exact
+same query and result set:
 
-**Inference:** documents `D1082` and `D0295` are only moderately relevant by TF-IDF alone
-(ranks 8 and 15) but sit in well-linked positions in the crawl graph; folding in
-PageRank moves them into the top-8. This is direct, observable evidence that *relevance
-score and ranking strategy are not the same thing* — a purely lexical ranker and a
-link-aware ranker genuinely disagree on result order, which is the core point Section D
-asks to be demonstrated.
+![Search & Ranking — TF-IDF baseline](../screenshots/07_search_baseline.png)
+![Search & Ranking — PageRank-boosted](../screenshots/08_search_pagerank.png)
+![Search & Ranking — HITS authority-boosted](../screenshots/09_search_hits.png)
+
+**Inference:** documents `D1082`, `D0295` and `D0104` are only moderately relevant by
+TF-IDF alone (ranks 8, 16, 21) but sit in well-linked positions in the crawl graph;
+folding in PageRank moves all three into the top 5 — `D0104` jumps 16 places. This is
+direct, observable evidence that *relevance score and ranking strategy are not the same
+thing* — a purely lexical ranker and a link-aware ranker genuinely disagree on result
+order, which is the core point Section D asks to be demonstrated.
 
 ### 4.2 Method comparison (10 evaluation queries, K=10)
 
 | Method | Precision | Recall | F1 | P@10 | R@10 | MAP | MRR | NDCG@10 |
 |---|---|---|---|---|---|---|---|---|
-| TF-IDF baseline | 0.908 | 0.628 | 0.713 | 0.937 | 0.229 | 0.594 | 1.000 | 0.967 |
-| TF-IDF + PageRank | 0.908 | 0.628 | 0.713 | 0.957 | 0.231 | 0.602 | 1.000 | 0.984 |
-| TF-IDF + HITS | 0.908 | 0.628 | 0.713 | 0.957 | 0.231 | 0.597 | 1.000 | 0.982 |
+| TF-IDF baseline | 0.908 | 0.6283 | 0.7134 | 0.9367 | 0.2288 | 0.5938 | 1.000 | 0.9669 |
+| TF-IDF + PageRank | 0.908 | 0.6283 | 0.7134 | 0.9467 | 0.2301 | 0.5947 | 1.000 | 0.975 |
+| TF-IDF + HITS | 0.908 | 0.6283 | 0.7134 | 0.9467 | 0.2301 | 0.5947 | 1.000 | 0.975 |
 
 (Full breakdown in §5 — this table is duplicated from the Evaluation tab for narrative
 continuity here.)
@@ -284,32 +309,35 @@ continuity here.)
 | D0976 | 0.1834 |
 | D0719 | 0.1678 |
 
-**Collaborative**, synthetic user `U001`:
+**Collaborative**, synthetic user `U001` (whose rating history skews politics/entertainment
+— see screenshot below):
 
-| doc_id | predicted_rating |
-|---|---|
-| D0389 | 1.589 |
-| D0173 | 1.461 |
-| D0417 | 1.237 |
-| D0964 | 1.193 |
-| D1075 | 1.158 |
+| doc_id | title | category | predicted_rating |
+|---|---|---|---|
+| D0910 | Outlook on currency volatility | business | 1.350 |
+| D0361 | Classical music season | entertainment | 1.274 |
+| D0179 | Transfer news | sport | 1.274 |
+| D0992 | Premiere night | entertainment | 1.274 |
 
 **Hybrid** (α = 0.5, user `U001`, seed `D001`):
 
-| doc_id | content score | collaborative score | hybrid score |
-|---|---|---|---|
-| D0173 | 0.240 | 0.946 | 0.593 |
-| D0356 | 0.680 | 0.445 | 0.563 |
-| D0389 | 0.033 | 1.000 | 0.517 |
-| D1006 | 0.291 | 0.729 | 0.510 |
-| D006 | 1.000 | 0.000 | 0.500 |
+| doc_id | title | category | content score | collaborative score | hybrid score |
+|---|---|---|---|---|---|
+| D0361 | Classical music season | entertainment | 0.133 | 0.960 | 0.547 |
+| D015 | Company investment | business | 0.507 | 0.579 | 0.543 |
+| D0850 | Tour announced | entertainment | 0.285 | 0.752 | 0.518 |
+| D0976 | Rates and consumer confidence | business | 0.663 | 0.372 | 0.517 |
+| D0970 | Podcasting season | entertainment | 0.181 | 0.834 | 0.507 |
 
-`[SCREENSHOT: Recommendations tab — all three modes]`
+![Recommendations tab — Content-based](../screenshots/10_recommend_content.png)
+![Recommendations tab — Collaborative](../screenshots/11_recommend_collaborative.png)
+![Recommendations tab — Hybrid](../screenshots/12_recommend_hybrid.png)
 
-**Inference:** the hybrid list is neither the content-based list nor the collaborative
-list — it surfaces documents (e.g. `D0173`, `D1006`) that neither pure strategy alone
-ranked at the top, illustrating the practical value of blending both signals (see §7, Q3
-for the deeper comparison).
+**Inference:** the hybrid list is neither the content-based list (all business, all about
+`D001`'s own topic) nor the collaborative list (mostly entertainment/sport, matching this
+user's rating history) — it surfaces a blend (3 entertainment, 2 business) that neither
+pure strategy alone would produce, illustrating the practical value of combining both
+signals (see §7, Q3 for the deeper comparison).
 
 ---
 
@@ -329,11 +357,12 @@ rather than presented as hand-labeled ground truth.
 
 | Method | Precision | Recall | F1 | P@10 | R@10 | MAP | MRR | NDCG@10 |
 |---|---|---|---|---|---|---|---|---|
-| TF-IDF baseline | 0.908 | 0.628 | 0.713 | 0.937 | 0.229 | 0.594 | 1.000 | 0.967 |
-| TF-IDF + PageRank | 0.908 | 0.628 | 0.713 | 0.957 | 0.231 | 0.602 | 1.000 | 0.984 |
-| TF-IDF + HITS | 0.908 | 0.628 | 0.713 | 0.957 | 0.231 | 0.597 | 1.000 | 0.982 |
+| TF-IDF baseline | 0.908 | 0.6283 | 0.7134 | 0.9367 | 0.2288 | 0.5938 | 1.000 | 0.9669 |
+| TF-IDF + PageRank | 0.908 | 0.6283 | 0.7134 | 0.9467 | 0.2301 | 0.5947 | 1.000 | 0.975 |
+| TF-IDF + HITS | 0.908 | 0.6283 | 0.7134 | 0.9467 | 0.2301 | 0.5947 | 1.000 | 0.975 |
 
-`[SCREENSHOT: Evaluation tab — comparison table + bar chart, and per-query detail table]`
+![Evaluation tab — method comparison, chart, and per-query detail](../screenshots/13_evaluation_comparison.png)
+![Evaluation tab — per-query detail table (scrolled)](../screenshots/14_evaluation_detail.png)
 
 **Inference:** overall Precision/Recall/F1 (computed over the *entire* retrieved
 candidate set, not just top-K) are identical across methods, because re-ranking only
@@ -489,18 +518,24 @@ corpora, the natural next step (noted in-app) would be an on-disk postings store
 the same SQLite approach already used for metadata/content) rather than an in-memory
 index.
 
-`[SCREENSHOT: Performance Analytics tab — timing log + charts, after exercising the other tabs]`
+![Performance Analytics tab — operation timing log after exercising all other tabs](../screenshots/15_performance_analytics.png)
 
 ---
 
 ## 9. Virtual Lab Usage
 
+> ⚠️ **The one screenshot in this report that is still a placeholder.** Every other
+> screenshot above was captured by actually driving this app end-to-end in a real browser
+> session (see the note at the top of this report) — but that was done outside the BITS
+> Virtual Lab, so it cannot stand in for this specific rubric item. Replace the line below
+> with a screenshot of **your own** BITS Virtual Lab terminal running `streamlit run
+> app.py`, plus the resulting browser view, before submitting.
+
 `[SCREENSHOT: BITS Virtual Lab session showing the app running — terminal with `streamlit run app.py` and the browser view]`
 
-To be completed after executing the app in the BITS Virtual Lab: paste a screenshot of the
-lab terminal invoking `streamlit run app.py`, and of the resulting browser session, to
-document that the submission was actually exercised on the platform, per the 1-mark
-"Executing the Assignment on BITS Lab portal" rubric item.
+Paste a screenshot of the lab terminal invoking `streamlit run app.py`, and of the
+resulting browser session, to document that the submission was actually exercised on the
+platform, per the 1-mark "Executing the Assignment on BITS Lab portal" rubric item.
 
 ---
 
@@ -510,8 +545,10 @@ document that the submission was actually exercised on the platform, per the 1-m
 - [x] Supporting files — `requirements.txt`, `README.md`
 - [x] Dataset used — `data/news_corpus.csv`; generated `data/ir_store.db` and
   `data/synthetic_ratings.csv` (created automatically the first time the app runs)
-- [ ] Report — this document, with screenshots inserted at every `[SCREENSHOT: ...]`
-  marker above, captured from a real run in the BITS Virtual Lab
+- [x] Report — this document; every screenshot except §9 (BITS Virtual Lab session) is
+  filled in with real, verified captures from an end-to-end run of the app
+- [ ] §9's BITS Virtual Lab screenshot specifically — the one placeholder that must still
+  be captured from your own session inside the lab (see the callout in §9)
 - [x] Live, publicly testable deployment — **https://assignment2-irgroup47.streamlit.app/**
   (see §0 above); this doesn't replace the BITS Virtual Lab screenshots requirement, but
   gives the evaluator a zero-setup way to interact with the app directly while grading
