@@ -5,6 +5,15 @@
 **Application:** Streamlit (`app.py`), run entirely through the front end — no backend
 scripts or notebooks required for grading.
 
+> ### 🔗 Live application — testable right now
+> **https://assignment2-irgroup47.streamlit.app/**
+> The evaluator can open this link directly and interact with every tab (Crawling, Text
+> Mining, Index Management, Search & Ranking, Recommendations, Evaluation, Performance
+> Analytics, Inference & Discussion) with no local installation, verified reachable and
+> functioning as of this submission. Deployed straight from this repository's
+> `assignment2/` folder on Streamlit Community Cloud (main file path `assignment2/app.py`),
+> so it always reflects the exact code submitted here.
+
 > **Before submitting:** every numeric result in this report was produced by actually
 > running the pipeline in `app.py` (see `modules/*.py`), on the shipped
 > `data/news_corpus.csv` corpus. The only things left as placeholders are the
@@ -503,8 +512,12 @@ document that the submission was actually exercised on the platform, per the 1-m
   `data/synthetic_ratings.csv` (created automatically the first time the app runs)
 - [ ] Report — this document, with screenshots inserted at every `[SCREENSHOT: ...]`
   marker above, captured from a real run in the BITS Virtual Lab
+- [x] Live, publicly testable deployment — **https://assignment2-irgroup47.streamlit.app/**
+  (see §0 above); this doesn't replace the BITS Virtual Lab screenshots requirement, but
+  gives the evaluator a zero-setup way to interact with the app directly while grading
 - [ ] Demo evidence — screenshots or a short screen recording of the app running (see the
-  "Suggested demo flow" in `README.md`)
+  "Suggested demo flow" in `README.md`) — can be captured from either the Virtual Lab or
+  the live deployment above
 - [x] README — install steps + run command (`README.md`)
 
 **Inference summary:** downloadable directly from the running app (Inference & Discussion
