@@ -344,6 +344,11 @@ with TABS[2]:
             result = mining_mod.classify_documents(
                 working["raw_text"].astype(str).tolist(), working["category"].astype(str).tolist(),
                 feature_type=feat_type, model_type=model_type)
+        if result["dropped_classes"]:
+            st.caption(f"Note: categories with fewer than 2 documents were excluded from "
+                       f"training (can't be stratified into train/test): {result['dropped_classes']}. "
+                       f"This happens once a crawl has pulled in a navigational page (e.g. the "
+                       f"crawler's single 'home' page) alongside the real news categories.")
         m1, m2, m3 = st.columns(3)
         m1.metric("Accuracy", result["accuracy"])
         m2.metric("F1 (macro)", result["f1_macro"])

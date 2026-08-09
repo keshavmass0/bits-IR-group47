@@ -149,13 +149,28 @@ def document_profile(doc_id: str, text: str, category: str,
 # Document classification
 # ------------------------------------------------------------------
 def classify_documents(texts: List[str], labels: List[str], feature_type: str = "tfidf",
-                        model_type: str = "nb", test_size: float = 0.25, random_state: int = 42
-                        ) -> Dict:
+                        model_type: str = "nb", test_size: float = 0.25, random_state: int = 42,
+                        min_class_size: int = 2) -> Dict:
     """Trains a classifier and returns accuracy/F1/confusion matrix.
 
     feature_type: "bow" | "tfidf"
     model_type:   "nb" (MultinomialNB) | "logreg" (LogisticRegression)
+
+    Classes with fewer than `min_class_size` documents are dropped before the
+    stratified split (rather than crashing): a stratified train_test_split
+    needs every class represented in both splits, which is impossible for a
+    singleton class. This matters in practice once the working corpus
+    includes crawled navigational pages (e.g. the crawler's "home" page is
+    a single document with its own pseudo-category) mixed in with real news
+    categories that have hundreds of documents each.
     """
+    counts = Counter(labels)
+    dropped_classes = sorted(c for c, n in counts.items() if n < min_class_size)
+    if dropped_classes:
+        keep = [i for i, lab in enumerate(labels) if counts[lab] >= min_class_size]
+        texts = [texts[i] for i in keep]
+        labels = [labels[i] for i in keep]
+
     vec = (CountVectorizer(max_features=5000, stop_words="english") if feature_type == "bow"
            else TfidfVectorizer(max_features=5000, stop_words="english"))
     X = vec.fit_transform(texts)
@@ -176,6 +191,7 @@ def classify_documents(texts: List[str], labels: List[str], feature_type: str = 
         "n_train": X_train.shape[0],
         "n_test": X_test.shape[0],
         "classes": classes,
+        "dropped_classes": dropped_classes,
     }
 
 
