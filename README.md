@@ -1,156 +1,51 @@
-# SmartIR Lab: Advanced Information Retrieval System
+# BITS WILP — Information Retrieval (S2-25) — Team 47
 
-SmartIR Lab is a Streamlit-based end-to-end Information Retrieval system designed for the BITS Information Retrieval Assignment 1. It allows the evaluator to upload a document collection, inspect preprocessing outputs, build indexes, run queries, compare retrieval techniques, and view experimental inferences directly from the front end.
+This repository holds both Information Retrieval assignments for Team 47, each in its own
+self-contained folder so they can be run, graded, and deployed independently — including
+as two separate apps on Streamlit Community Cloud from this single repo (see below).
 
-## Features
+## Contents
 
-- Upload CSV or TXT document collections
-- View uploaded documents and dataset statistics
-- Tokenization and inverted index creation
-- Lowercasing
-- Stop word removal
-- Hyphen handling
-- Stemming and lemmatization
-- Stemming vs lemmatization retrieval comparison with average TF-IDF cosine similarity (retrieval quality measure) and an automatic conclusion
-- TF-IDF ranked retrieval
-- Boolean retrieval with AND, OR and NOT
-- Phrase query processing using:
-  - Biword index (index representation + query results displayed)
-  - Positional index (index representation + query results displayed)
-- False-positive analysis for biword phrase search with worked example
-- Dictionary search using:
-  - Binary Search Tree (with balanced vs sorted/skewed insertion experiment)
-  - B-Tree
-- Query search time AND retrieval time comparison for BST vs B-Tree (averaged over configurable repetitions), plus build time and tree height
-- Tolerant retrieval using:
-  - Wildcard queries
-  - Edit distance spelling correction
-  - K-gram suggestions
-  - Phonetic correction (Soundex)
-- Inference dashboard with downloadable summary
+| Folder | Assignment | App | Live URL |
+|---|---|---|---|
+| [`assignment1/`](assignment1/) | Assignment 1 — SmartIR Lab (preprocessing, indexing, phrase/boolean/tolerant retrieval) | `assignment1/app.py` | _fill in after deploying — see below_ |
+| [`assignment2/`](assignment2/) | Assignment 2 — SmartIR-2 (crawling, text mining, search & ranking, recommenders, evaluation) | `assignment2/app.py` | _fill in after deploying — see below_ |
 
-## Recommended Dataset
+Each folder has its own `README.md` with install/run instructions specific to that
+assignment — start there for details.
 
-Use the BBC News Summary / BBC News Articles dataset. It is easily available on Kaggle and contains real-world news articles from categories such as business, entertainment, politics, sport and technology.
-
-A small BBC-style sample dataset is already included as `sample_bbc_news.csv` so the project runs immediately even without downloading an external dataset.
-
-## Project Structure
-
-```text
-SmartIR_Lab/
-├── app.py
-├── requirements.txt
-├── sample_bbc_news.csv
-├── README.md
-└── report_template.md
-```
-
-## Installation
-
-Create and activate a virtual environment if required:
+## Running locally
 
 ```bash
-python -m venv venv
-venv\Scripts\activate
+# Assignment 1
+cd assignment1 && pip install -r requirements.txt && streamlit run app.py
+
+# Assignment 2
+cd assignment2 && pip install -r requirements.txt && streamlit run app.py
 ```
 
-Install dependencies:
+## Deploying both apps to Streamlit Community Cloud from this one repo
 
-```bash
-pip install -r requirements.txt
-```
+Streamlit Community Cloud deploys **one app per "main file path"**, not one app per repo —
+so a single GitHub repo (this one) can back multiple independently-URLed apps, each
+pointed at a different file. That's exactly how this repo is laid out: two folders, two
+`requirements.txt` files (Streamlit Cloud looks for `requirements.txt` next to the main
+file first), two apps.
 
-## Run the Application
+For each assignment, on [share.streamlit.io](https://share.streamlit.io):
 
-```bash
-streamlit run app.py
-```
+1. **New app** → pick this GitHub repo and the `main` branch (or whichever branch you
+   deploy from).
+2. **Main file path**: `assignment1/app.py` for the first app, `assignment2/app.py` for
+   the second.
+3. **App URL**: choose a distinct subdomain for each, e.g. `bits-ir47-a1` and
+   `bits-ir47-a2` → `https://bits-ir47-a1.streamlit.app` / `https://bits-ir47-a2.streamlit.app`.
+4. Deploy. Repeat for the second app with its own main file path/URL.
 
-## How to Use
+Both apps redeploy automatically on every push to the branch they're linked to, and are
+otherwise fully independent (separate logs, separate restart/reboot controls, separate
+resource limits) despite sharing one repo.
 
-1. Start the Streamlit app.
-2. Use the included sample dataset or upload your own CSV/TXT collection.
-3. Select the text column if using CSV.
-4. Choose preprocessing options from the sidebar.
-5. Select a retrieval model.
-6. Enter a query.
-7. Explore each tab:
-   - Dataset Overview
-   - Preprocessing
-   - Inverted Index
-   - Search Results
-   - Phrase Comparison
-   - BST vs B-Tree
-   - Tolerant Retrieval
-   - Inference Dashboard
+## Team
 
-## Suggested Demo Queries
-
-```text
-prime minister economic policy
-economic growth
-stock market prices
-football match
-government policy reform
-technology company
-```
-
-Queries where stemming and lemmatization visibly differ (stemming retrieves 0 documents, lemmatization retrieves the relevant ones):
-
-```text
-market price
-national service
-```
-
-Phrase query that demonstrates a biword false positive (D026 matches biword but not positional):
-
-```text
-stock market prices
-```
-
-## Suggested Tolerant Retrieval Queries
-
-Wildcard:
-
-```text
-govern*
-econom*
-tech*
-```
-
-Spelling correction:
-
-```text
-goverment
-economi
-futball
-tecnology
-```
-
-K-gram suggestions:
-
-```text
-econmy
-govermnt
-technlogy
-```
-
-Phonetic correction (Soundex):
-
-```text
-goverment
-ekonomy
-fonetic
-```
-
-## Notes for Assignment Report
-
-Use `report_template.md` to prepare the final written report. Add screenshots from your own Streamlit run in the Virtual Lab portal.
-
-## Important Inference Summary
-
-- Lemmatization is generally better for news documents because it preserves meaningful base words.
-- Positional index is more accurate than biword index for long phrase queries.
-- B-Tree is more scalable than BST for large dictionary lookup.
-- Tolerant retrieval improves usability for spelling errors, wildcard queries and partial terms.
+Team 47 — BITS WILP Information Retrieval, Merged AIMLCZG537/DSECLZG537, S2-25.

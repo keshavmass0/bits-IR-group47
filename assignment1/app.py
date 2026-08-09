@@ -4,6 +4,7 @@ import math
 import fnmatch
 from dataclasses import dataclass
 from collections import defaultdict, Counter
+from pathlib import Path
 from typing import Dict, List, Tuple, Set, Optional
 
 import numpy as np
@@ -422,7 +423,9 @@ def phonetic_matches(term: str, vocab: List[str], max_candidates: int = 10) -> L
 
 @st.cache_data(show_spinner=False)
 def load_sample():
-    return pd.read_csv("sample_bbc_news.csv")
+    # Resolve relative to this file (not the process cwd) so it works both
+    # locally and on Streamlit Community Cloud regardless of working directory.
+    return pd.read_csv(Path(__file__).parent / "sample_bbc_news.csv")
 
 
 @st.cache_data(show_spinner=False)

@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.DS_Store
+
+# Assignment-2 runtime artifacts (regenerated on first run — see assignment2/README.md)
+assignment2/data/ir_store.db
+assignment2/data/synthetic_ratings.csv
+
+# Streamlit secrets (never commit these if you add any)
+**/.streamlit/secrets.toml
