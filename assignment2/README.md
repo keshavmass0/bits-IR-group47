@@ -9,6 +9,13 @@ PageRank/HITS) → recommendation (content-based, collaborative, hybrid) → eva
 from the Streamlit front end only — there is no separate notebook or backend script the
 evaluator needs to run.
 
+> **🔗 Live demo — test it right now, no installation needed:**
+> **https://assignment2-irgroup47.streamlit.app/**
+> Deployed on Streamlit Community Cloud directly from this repo's `assignment2/` folder
+> (main file path `assignment2/app.py`), redeploying automatically on every push to `main`.
+> All 9 tabs are fully interactive — crawl, build the index, search, get recommendations,
+> and run the evaluation comparison directly in the browser.
+
 ## Project structure
 
 ```text

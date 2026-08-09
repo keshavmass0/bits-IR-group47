@@ -9,7 +9,7 @@ as two separate apps on Streamlit Community Cloud from this single repo (see bel
 | Folder | Assignment | App | Live URL |
 |---|---|---|---|
 | [`assignment1/`](assignment1/) | Assignment 1 — SmartIR Lab (preprocessing, indexing, phrase/boolean/tolerant retrieval) | `assignment1/app.py` | _fill in after deploying — see below_ |
-| [`assignment2/`](assignment2/) | Assignment 2 — SmartIR-2 (crawling, text mining, search & ranking, recommenders, evaluation) | `assignment2/app.py` | _fill in after deploying — see below_ |
+| [`assignment2/`](assignment2/) | Assignment 2 — SmartIR-2 (crawling, text mining, search & ranking, recommenders, evaluation) | `assignment2/app.py` | **[assignment2-irgroup47.streamlit.app](https://assignment2-irgroup47.streamlit.app/)** ✅ live — test it directly |
 
 Each folder has its own `README.md` with install/run instructions specific to that
 assignment — start there for details.
