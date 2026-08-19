@@ -7,5 +7,9 @@ assignment2/data/ir_store.db
 assignment2/data/synthetic_ratings.csv
 assignment2/report/_REPORT_render.html
 
+# Raw screenshot drop-off (staging only; curated copies live in
+# assignment2/bits_lab_screenshots/, which IS tracked)
+assignment2/bits-ss/
+
 # Streamlit secrets (never commit these if you add any)
 **/.streamlit/secrets.toml

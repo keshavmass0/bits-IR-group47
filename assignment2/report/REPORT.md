@@ -19,8 +19,9 @@ scripts or notebooks required for grading.
 > headlessly through a real browser session against the local app — not fabricated or
 > hand-typed. Screenshots reflect one specific run (crawl seed/depth are configurable, so
 > exact figures shift slightly run-to-run — the qualitative patterns discussed do not).
-> The one screenshot that genuinely cannot be produced this way is the **BITS Virtual Lab
-> session** itself (§9) — that still needs to be captured from your own run inside the lab.
+> §9's screenshots are the exception and complement, not a substitute: 17 real captures
+> from inside the **BITS Virtual Lab portal** itself, exercising the live deployed app
+> tab by tab — see §9 for the full walkthrough.
 
 ---
 
@@ -524,18 +525,41 @@ index.
 
 ## 9. Virtual Lab Usage
 
-> ⚠️ **The one screenshot in this report that is still a placeholder.** Every other
-> screenshot above was captured by actually driving this app end-to-end in a real browser
-> session (see the note at the top of this report) — but that was done outside the BITS
-> Virtual Lab, so it cannot stand in for this specific rubric item. Replace the line below
-> with a screenshot of **your own** BITS Virtual Lab terminal running `streamlit run
-> app.py`, plus the resulting browser view, before submitting.
+All 17 screenshots below were captured inside the **BITS Virtual Lab portal** (remote
+desktop at `argo-rdp.codeargo.net`, Rocky Linux environment, session date 2026-08-13,
+~20:41–20:54, "Cloud User" visible in the top bar in every capture) — Firefox, running
+inside the lab desktop, accessing the live deployed application at
+**https://assignment2-irgroup47.streamlit.app/**. This is a deliberate variant of "running
+the app in the lab": rather than re-invoking `streamlit run app.py` in the lab terminal
+against a fresh local process, the *exact same code* (this repository's `assignment2/`
+folder, auto-deployed on every push — see §0) is exercised interactively, tab by tab,
+from inside the lab browser. Every tab of the application was visited and interacted with
+from this session, in order:
 
-`[SCREENSHOT: BITS Virtual Lab session showing the app running — terminal with `streamlit run app.py` and the browser view]`
+![Dashboard — system overview](../bits_lab_screenshots/01_dashboard.jpeg)
+![Dashboard — pipeline map and working-corpus sample](../bits_lab_screenshots/02_dashboard_pipeline_map.jpeg)
+![Crawling — seed/depth configuration before running a crawl](../bits_lab_screenshots/03_crawling_config.jpeg)
+![Crawling — results after running a crawl from the lab session (200 pages fetched)](../bits_lab_screenshots/04_crawling_results.jpeg)
+![Text Mining — category and document-length distribution charts](../bits_lab_screenshots/05_text_mining_charts.jpeg)
+![Text Mining — keyword extraction, document profiling, and the classifier controls](../bits_lab_screenshots/06_text_mining_keywords.jpeg)
+![Text Mining — classifier results, showing the singleton-class-drop fix (§3.3) firing live: "categories with fewer than 2 documents were excluded... ['home']"](../bits_lab_screenshots/07_text_mining_classifier.jpeg)
+![Text Mining — comparative analysis across preprocessing/feature strategies](../bits_lab_screenshots/08_text_mining_comparative.jpeg)
+![Index Management — inverted index and TF-IDF stats after rebuilding](../bits_lab_screenshots/09_index_management.jpeg)
+![Index Management — postings lookup for the term "market"](../bits_lab_screenshots/10_index_postings_lookup.jpeg)
+![Search & Ranking — query processing and the three ranking tabs](../bits_lab_screenshots/11_search_ranking.jpeg)
+![Search & Ranking — relevance-vs-blended-score chart](../bits_lab_screenshots/12_search_ranking_chart.jpeg)
+![Recommendations — content-based results for document D001](../bits_lab_screenshots/13_recommendations.jpeg)
+![Evaluation — method comparison table, run live from the lab session](../bits_lab_screenshots/14_evaluation.jpeg)
+![Evaluation — per-query detail for TF-IDF + PageRank](../bits_lab_screenshots/15_evaluation_per_query.jpeg)
+![Performance Analytics — operation timing log for this exact lab session](../bits_lab_screenshots/16_performance_analytics.jpeg)
+![Inference & Discussion — all five compulsory questions, with the downloadable summary button](../bits_lab_screenshots/17_inference_discussion.jpeg)
 
-Paste a screenshot of the lab terminal invoking `streamlit run app.py`, and of the
-resulting browser session, to document that the submission was actually exercised on the
-platform, per the 1-mark "Executing the Assignment on BITS Lab portal" rubric item.
+**Note on the classifier fix (Figure above, Text Mining → classifier results):** this lab
+session's crawl (seeded from `local-news://home`, Figures 3–4) pulled the crawler's home
+page into the working corpus as a singleton `home` category, and the classifier correctly
+excluded it with a visible warning rather than crashing — direct, live confirmation that
+the bug described in §3.3 is genuinely fixed on the deployed application (not just in the
+local testing that originally caught it).
 
 ---
 
@@ -545,16 +569,14 @@ platform, per the 1-mark "Executing the Assignment on BITS Lab portal" rubric it
 - [x] Supporting files — `requirements.txt`, `README.md`
 - [x] Dataset used — `data/news_corpus.csv`; generated `data/ir_store.db` and
   `data/synthetic_ratings.csv` (created automatically the first time the app runs)
-- [x] Report — this document; every screenshot except §9 (BITS Virtual Lab session) is
-  filled in with real, verified captures from an end-to-end run of the app
-- [ ] §9's BITS Virtual Lab screenshot specifically — the one placeholder that must still
-  be captured from your own session inside the lab (see the callout in §9)
+- [x] Report — this document; every screenshot placeholder is filled with real, verified
+  captures, including §9's 17 genuine BITS Virtual Lab screenshots
+- [x] BITS Virtual Lab evidence — §9, 17 screenshots captured inside the lab portal
+  (`argo-rdp.codeargo.net`), exercising every tab of the live deployed app
 - [x] Live, publicly testable deployment — **https://assignment2-irgroup47.streamlit.app/**
-  (see §0 above); this doesn't replace the BITS Virtual Lab screenshots requirement, but
-  gives the evaluator a zero-setup way to interact with the app directly while grading
-- [ ] Demo evidence — screenshots or a short screen recording of the app running (see the
-  "Suggested demo flow" in `README.md`) — can be captured from either the Virtual Lab or
-  the live deployment above
+  (see §0 above) — the same app exercised in §9's lab screenshots
+- [x] Demo evidence — §9's 17-screenshot walkthrough doubles as this; see the "Suggested
+  demo flow" in `README.md` for a short screen recording if one is additionally wanted
 - [x] README — install steps + run command (`README.md`)
 
 **Inference summary:** downloadable directly from the running app (Inference & Discussion
