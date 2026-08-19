@@ -44,7 +44,8 @@ assignment2/
 │   ├── REPORT.md                       # Full assignment report source (see submission checklist below)
 │   ├── SmartIR-2_Report_Team47.pdf     # Submission-ready PDF rendering of the above
 │   └── generate_pdf.py                 # Regenerates the PDF after editing REPORT.md
-└── screenshots/                 # Put your Virtual Lab screenshots here before zipping up
+├── screenshots/                 # App screenshots embedded throughout REPORT.md §2-8
+└── bits_lab_screenshots/        # 17 real BITS Virtual Lab captures embedded in REPORT.md §9
 ```
 
 ## Installation
@@ -136,12 +137,11 @@ Then open the printed local URL in a browser. All 9 sections are tabs across the
 - [x] Dataset used (`data/news_corpus.csv`, plus generated `ir_store.db` /
   `synthetic_ratings.csv`)
 - [x] `README.md` with install + run instructions (this file)
-- [ ] Report with implementation explanation, **screenshots taken from your own run in the
-  BITS Virtual Lab**, experimental results/inferences (`report/REPORT.md` — fill in the
-  screenshot placeholders after running the app in the Virtual Lab, per the instructions in
-  that file)
-- [ ] Demo evidence: screenshots or a short screen recording of the running application
-  (capture while doing the demo flow above)
+- [x] Report with implementation explanation, screenshots, experimental results/inferences
+  (`report/REPORT.md` / `SmartIR-2_Report_Team47.pdf`) — including §9's 17 real BITS
+  Virtual Lab screenshots (`bits_lab_screenshots/`)
+- [x] Demo evidence: §9's 17-screenshot Virtual Lab walkthrough covers this; a screen
+  recording (see the demo flow above) is optional on top of it, not required
 
-The two unchecked items require you to actually execute the app in the BITS Virtual Lab
-(that step can't be performed on your behalf) — everything else is complete and verified.
+Everything is complete and verified — including execution on the BITS Virtual Lab
+portal, evidenced in `report/REPORT.md` §9.
